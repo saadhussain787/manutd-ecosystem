@@ -1,8 +1,21 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import StatsDashboard from '@/components/StatsDashboard';
 
+// Check if we are running in Amplify (which uses our custom prefix to bypass AWS restrictions)
+const amplifyCredentials = process.env.MY_AWS_ACCESS_KEY_ID
+  ? {
+      credentials: {
+        accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY || "",
+      },
+    }
+  : {};
+
 // Initialize the S3 Client for the Canada Central region
-const s3 = new S3Client({ region: "ca-central-1" });
+const s3 = new S3Client({ 
+  region: "ca-central-1",
+  ...amplifyCredentials
+});
 const BUCKET_NAME = "manutd-ecosystem-data-303238378489-ca-central-1";
 
 async function fetchFromS3(key: string) {
