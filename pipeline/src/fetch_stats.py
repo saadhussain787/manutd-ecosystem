@@ -4,7 +4,7 @@ import urllib.request
 import boto3
 
 # Initialize AWS clients
-ssm = boto3.client('ssm', region_name='us-east-1')
+ssm = boto3.client('ssm') # Automatically uses the deployment region (ca-central-1)
 s3 = boto3.client('s3')
 
 def get_ssm_parameter(param_name):
@@ -66,12 +66,33 @@ def lambda_handler(event, context):
         """
         
         ai_response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=prompt,
         )
         youtube_script = ai_response.text
         
         print("Generated YouTube Script Successfully!")
+        
+        # 7. Save data and script to our secure S3 Bucket
+        bucket_name = os.environ['DATA_BUCKET_NAME']
+        
+        # Save cleaned JSON stats
+        s3.put_object(
+            Bucket=bucket_name,
+            Key='latest_stats.json',
+            Body=json.dumps(clean_stats),
+            ContentType='application/json'
+        )
+        
+        # Save generated YouTube script
+        s3.put_object(
+            Bucket=bucket_name,
+            Key='latest_youtube_script.txt',
+            Body=youtube_script,
+            ContentType='text/plain'
+        )
+        
+        print(f"Successfully saved files to S3 bucket: {bucket_name}")
         
         return {
             "statusCode": 200,
