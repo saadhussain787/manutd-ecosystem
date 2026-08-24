@@ -1,9 +1,10 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import StatsDashboard from '@/components/StatsDashboard';
+import AdvancedAnalytics from '@/components/AdvancedAnalytics';
 import AffiliateBlock from '@/components/AffiliateBlock';
 import PremiumPaywall from '@/components/PremiumPaywall';
 
-// Check if we are running in Amplify (which uses our custom prefix to bypass AWS restrictions)
+// Check if we are running in Amplify
 const amplifyCredentials = process.env.MY_AWS_ACCESS_KEY_ID
   ? {
       credentials: {
@@ -13,12 +14,20 @@ const amplifyCredentials = process.env.MY_AWS_ACCESS_KEY_ID
     }
   : {};
 
-// Initialize the S3 Client for the Canada Central region
+// Initialize S3 Client
 const s3 = new S3Client({ 
   region: "ca-central-1",
   ...amplifyCredentials
 });
 const BUCKET_NAME = "manutd-ecosystem-data-303238378489-ca-central-1";
+
+export async function generateMetadata() {
+  return {
+    title: "Manchester United | Official Tactical Hub",
+    description: "Live Manchester United player statistics, match analysis, and exclusive tactical breakdowns powered by AI.",
+    keywords: ["Manchester United", "Man Utd stats", "Premier League data", "FPL stats", "Tactical analysis"],
+  }
+}
 
 async function fetchFromS3(key: string) {
   try {
@@ -32,30 +41,74 @@ async function fetchFromS3(key: string) {
 }
 
 export default async function Home() {
-  // 1. Securely fetch our live data directly from AWS S3!
   const rawStats = await fetchFromS3("latest_stats.json");
   const youtubeScript = await fetchFromS3("latest_youtube_script.txt");
 
-  // 2. Parse the JSON (fallback to mock data if it fails)
-  const statsData = rawStats ? JSON.parse(rawStats) : { wins: 0, draws: 0, loses: 0 };
+  const statsData = rawStats ? JSON.parse(rawStats) : { top_performers: [] };
   const finalScript = youtubeScript || "Loading live Gemini AI analysis from AWS...";
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center p-8">
-      <header className="mb-12 text-center mt-10">
-        <h1 className="text-5xl md:text-7xl font-heading text-[var(--color-utd-red)] uppercase tracking-wider mb-4 drop-shadow-lg">
-          Manchester United
-        </h1>
-        <h2 className="text-2xl font-body text-[var(--color-utd-gold)] uppercase tracking-widest font-bold">
-          Live Data Ecosystem
-        </h2>
-      </header>
+    <main className="min-h-screen bg-black text-white flex flex-col items-center">
       
-      <StatsDashboard statsData={statsData} youtubeScript={finalScript} />
+      {/* 1. Dynamic Gradient Hero Section */}
+      <section className="relative w-full min-h-[70vh] flex flex-col md:flex-row items-center justify-between p-8 md:p-16 overflow-hidden bg-gradient-to-br from-[#4a0907] via-charcoal to-black">
+        {/* Left side: Gemini News Headline */}
+        <div className="w-full md:w-3/5 z-10">
+          <span className="text-utd-gold font-bold tracking-widest uppercase mb-2 block">Latest Analysis</span>
+          <h1 className="text-5xl md:text-7xl font-heading text-white uppercase tracking-wider mb-6 drop-shadow-lg">
+            Tactical Breakdown
+          </h1>
+          <p className="text-xl text-gray-300 font-body leading-relaxed glass-card p-6 border-l-4 border-utd-red shadow-2xl">
+            {finalScript.substring(0, 300)}... 
+          </p>
+        </div>
+
+        {/* Right side: Live Match Widget */}
+        <div className="w-full md:w-2/5 mt-12 md:mt-0 z-10 flex justify-end">
+          <div className="glass-card p-8 w-full max-w-sm text-center transform hover:scale-105 transition-transform duration-300">
+            <h3 className="text-utd-gold font-heading uppercase text-2xl mb-6">Live Match Center</h3>
+            <div className="flex justify-between items-center text-4xl font-bold font-heading">
+              <span>MUN</span>
+              <span className="text-utd-red bg-white/10 px-4 py-2 rounded-lg">2 - 0</span>
+              <span>CHE</span>
+            </div>
+            <p className="text-sm text-gray-400 mt-6 font-body">Simulated Live Data Widget</p>
+          </div>
+        </div>
+      </section>
       
-      <AffiliateBlock />
+      {/* 2. Simulated News Grid */}
+      <section className="w-full max-w-7xl mx-auto p-8 mt-12">
+        <h2 className="text-4xl font-heading uppercase text-white mb-8 border-b border-gray-800 pb-4">Top Headlines</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[1,2,3].map(i => (
+            <div key={i} className="glass-card group cursor-pointer overflow-hidden flex flex-col">
+              <div className="h-48 bg-gradient-to-r from-gray-800 to-gray-900 w-full group-hover:scale-105 transition-transform duration-500"></div>
+              <div className="p-6 flex-grow">
+                <span className="text-utd-red text-sm font-bold uppercase mb-2 block">Club News</span>
+                <h3 className="text-xl font-body font-bold text-white group-hover:text-utd-gold transition-colors">
+                  Breaking: Simulated Article Headline #{i} Generated by AI
+                </h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       
-      <PremiumPaywall />
+      {/* 3. Stats Dashboard */}
+      <section className="w-full max-w-7xl mx-auto p-8 mt-12">
+        <StatsDashboard statsData={statsData} youtubeScript={finalScript} />
+      </section>
+
+      {/* 4. Advanced Analytics (Radar Chart) */}
+      <section className="w-full max-w-7xl mx-auto p-8 mt-4">
+        <AdvancedAnalytics statsData={statsData} />
+      </section>
+
+      <section className="w-full max-w-7xl mx-auto p-8">
+        <AffiliateBlock />
+        <PremiumPaywall />
+      </section>
     </main>
   );
 }
