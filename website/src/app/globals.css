@@ -3,6 +3,7 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
+  --charcoal: #111111;
   --utd-red: #DA291C;
   --utd-gold: #FBE122;
 }
@@ -10,14 +11,22 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-charcoal: var(--charcoal);
   --color-utd-red: var(--utd-red);
   --color-utd-gold: var(--utd-gold);
   --font-heading: var(--font-oswald);
   --font-body: var(--font-inter);
 }
 
+@layer utilities {
+  .glass-card {
+    @apply bg-charcoal/60 backdrop-blur-md border border-white/10 shadow-lg rounded-xl;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
