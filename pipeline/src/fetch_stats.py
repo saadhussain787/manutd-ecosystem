@@ -37,7 +37,6 @@ def lambda_handler(event, context):
             data = json.loads(response.read().decode())
             
         # 4. Clean the data to save tokens for Gemini later
-        # Stripping unnecessary nesting to keep the payload lightweight
         clean_stats = {
             "team": data["response"]["team"]["name"],
             "form": data["response"]["form"],
@@ -49,18 +48,42 @@ def lambda_handler(event, context):
             "goals_against": data["response"]["goals"]["against"]["total"]["total"]
         }
         
-        print("Successfully fetched and cleaned stats:", json.dumps(clean_stats))
+        # 5. Fetch Gemini API Key & Initialize AI
+        gemini_api_key = get_ssm_parameter("/manutd-ecosystem/GeminiApiKey")
+        
+        # Using the official google-genai SDK
+        from google import genai
+        from google.genai import types
+        
+        client = genai.Client(api_key=gemini_api_key)
+        
+        # 6. Generate the YouTube Script using the cleaned data
+        prompt = f"""
+        Act as a professional Manchester United sports analyst. 
+        Write an engaging, 4-minute YouTube script analyzing this current data: {json.dumps(clean_stats)}. 
+        Focus on the team's form, goal difference, and overall performance.
+        Do not include camera directions, just the spoken script.
+        """
+        
+        ai_response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        youtube_script = ai_response.text
+        
+        print("Generated YouTube Script Successfully!")
         
         return {
             "statusCode": 200,
             "body": json.dumps({
-                "message": "Successfully fetched Manchester United stats!",
-                "data": clean_stats
+                "message": "Successfully fetched stats and generated script!",
+                "data": clean_stats,
+                "script": youtube_script
             })
         }
         
     except Exception as e:
-        print(f"Error fetching data: {str(e)}")
+        print(f"Error fetching data or generating script: {str(e)}")
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})
