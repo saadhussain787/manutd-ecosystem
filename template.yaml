@@ -13,7 +13,20 @@ Resources:
       Runtime: python3.11
       Timeout: 30
       MemorySize: 256
+      Environment:
+        Variables:
+          DATA_BUCKET_NAME: !Ref ManUtdDataBucket
+      Events:
+        MatchUpdateSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 22 ? * 1,7 *)' # Runs automatically at 22:00 UTC on match days (Sun/Mon)
+            Name: ManUtdMatchUpdateSchedule
+            Description: Triggers the stats pipeline automatically
+            Enabled: true
       Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ManUtdDataBucket
         - Statement:
             - Effect: Allow
               Action:
@@ -21,3 +34,13 @@ Resources:
               Resource: 
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/manutd-ecosystem/ApiFootballKey'
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/manutd-ecosystem/GeminiApiKey'
+
+  ManUtdDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'manutd-ecosystem-data-${AWS::AccountId}-${AWS::Region}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
