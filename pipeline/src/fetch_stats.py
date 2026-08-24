@@ -1,10 +1,10 @@
 import json
 import os
-import urllib.request
+import requests
 import boto3
 
 # Initialize AWS clients
-ssm = boto3.client('ssm') # Automatically uses the deployment region (ca-central-1)
+ssm = boto3.client('ssm')
 s3 = boto3.client('s3')
 
 def get_ssm_parameter(param_name):
@@ -12,56 +12,73 @@ def get_ssm_parameter(param_name):
     response = ssm.get_parameter(Name=param_name, WithDecryption=True)
     return response['Parameter']['Value']
 
-def lambda_handler(event, context):
-    """
-    AWS Lambda entry point.
-    Fetches Manchester United stats from API-Football.
-    """
-    try:
-        # 1. Fetch our secure API Key
-        api_key = get_ssm_parameter("/manutd-ecosystem/ApiFootballKey")
-        
-        # Manchester United Team ID in API-Football is 33
-        team_id = "33"
-        season = "2023" # Current or target season
-        
-        # 2. Setup the request to API-Football
-        url = f"https://v3.football.api-sports.io/teams/statistics?season={season}&team={team_id}&league=39"
-        
-        req = urllib.request.Request(url)
-        req.add_header('x-rapidapi-key', api_key)
-        req.add_header('x-rapidapi-host', 'v3.football.api-sports.io')
-        
-        # 3. Execute request
-        with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode())
+def fetch_fpl_data():
+    """Fetches Manchester United player data from the free Official FPL API."""
+    url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+    headers = {
+        # FPL API requires a User-Agent to prevent blocking
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    
+    # Find Manchester United's Team ID (usually 14)
+    man_utd_id = None
+    for team in data['teams']:
+        if team['name'] == 'Man Utd':
+            man_utd_id = team['id']
+            break
             
-        # 4. Clean the data to save tokens for Gemini later
+    # Extract all Man Utd players
+    players = []
+    for element in data['elements']:
+        if element['team'] == man_utd_id:
+            # The FPL API uses the 'code' for the high-res image
+            photo_code = str(element['code'])
+            players.append({
+                "name": f"{element['first_name']} {element['second_name']}",
+                "position_id": element['element_type'],
+                "goals": element['goals_scored'],
+                "assists": element['assists'],
+                "clean_sheets": element['clean_sheets'],
+                "form": element['form'],
+                "ict_index": element['ict_index'], # Influence, Creativity, Threat
+                "image_url": f"https://resources.premierleague.com/premierleague/photos/players/250x250/p{photo_code}.png"
+            })
+            
+    # Sort players by ICT index (overall impact) descending
+    players.sort(key=lambda x: float(x['ict_index']), reverse=True)
+    return players[:10] # Return top 10 players to save AI token limits
+
+def lambda_handler(event, context):
+    """AWS Lambda entry point for the $0 Data Engine."""
+    try:
+        print("Fetching free data from FPL API...")
+        # 1. Fetch free data (wrapped in try/except for robustness)
+        try:
+            top_players = fetch_fpl_data()
+        except Exception as scrape_err:
+            print(f"Scraping failed: {str(scrape_err)}")
+            raise Exception("Critical: Failed to fetch fallback FPL data.")
+            
         clean_stats = {
-            "team": data["response"]["team"]["name"],
-            "form": data["response"]["form"],
-            "fixtures_played": data["response"]["fixtures"]["played"]["total"],
-            "wins": data["response"]["fixtures"]["wins"]["total"],
-            "draws": data["response"]["fixtures"]["draws"]["total"],
-            "loses": data["response"]["fixtures"]["loses"]["total"],
-            "goals_for": data["response"]["goals"]["for"]["total"]["total"],
-            "goals_against": data["response"]["goals"]["against"]["total"]["total"]
+            "team": "Manchester United",
+            "top_performers": top_players
         }
         
-        # 5. Fetch Gemini API Key & Initialize AI
+        # 2. Fetch Gemini API Key & Initialize AI
         gemini_api_key = get_ssm_parameter("/manutd-ecosystem/GeminiApiKey")
         
-        # Using the official google-genai SDK
         from google import genai
-        from google.genai import types
-        
         client = genai.Client(api_key=gemini_api_key)
         
-        # 6. Generate the YouTube Script using the cleaned data
+        # 3. Generate the YouTube Script using the FPL data
         prompt = f"""
         Act as a professional Manchester United sports analyst. 
-        Write an engaging, 4-minute YouTube script analyzing this current data: {json.dumps(clean_stats)}. 
-        Focus on the team's form, goal difference, and overall performance.
+        Write an engaging, 4-minute YouTube script analyzing this current player data: {json.dumps(clean_stats)}. 
+        Focus on the top performers, their ICT index (Influence, Creativity, Threat), and their form.
         Do not include camera directions, just the spoken script.
         """
         
@@ -70,10 +87,9 @@ def lambda_handler(event, context):
             contents=prompt,
         )
         youtube_script = ai_response.text
-        
         print("Generated YouTube Script Successfully!")
         
-        # 7. Save data and script to our secure S3 Bucket
+        # 4. Save data and script to our secure S3 Bucket
         bucket_name = os.environ['DATA_BUCKET_NAME']
         
         # Save cleaned JSON stats
@@ -91,29 +107,23 @@ def lambda_handler(event, context):
             Body=youtube_script,
             ContentType='text/plain'
         )
-        
         print(f"Successfully saved files to S3 bucket: {bucket_name}")
         
-        # 8. Trigger AWS Amplify Webhook to rebuild the frontend site
+        # 5. Trigger AWS Amplify Webhook to rebuild the frontend site
         try:
             webhook_url = get_ssm_parameter("AmplifyWebhookUrl")
-            req_webhook = urllib.request.Request(webhook_url, method='POST')
-            with urllib.request.urlopen(req_webhook) as response:
-                print(f"Triggered Amplify Webhook: {response.status}")
+            requests.post(webhook_url)
+            print("Triggered Amplify Webhook.")
         except Exception as webhook_err:
-            print(f"Warning: Failed to trigger webhook. Check parameter: {str(webhook_err)}")
+            print(f"Warning: Failed to trigger webhook. {str(webhook_err)}")
         
         return {
             "statusCode": 200,
-            "body": json.dumps({
-                "message": "Successfully fetched stats and generated script!",
-                "data": clean_stats,
-                "script": youtube_script
-            })
+            "body": json.dumps({"message": "Success! Scraped FPL data and saved to S3."})
         }
         
     except Exception as e:
-        print(f"Error fetching data or generating script: {str(e)}")
+        print(f"Error executing Lambda: {str(e)}")
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)})
