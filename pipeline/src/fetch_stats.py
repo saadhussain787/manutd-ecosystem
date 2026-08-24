@@ -1,0 +1,67 @@
+import json
+import os
+import urllib.request
+import boto3
+
+# Initialize AWS clients
+ssm = boto3.client('ssm', region_name='us-east-1')
+s3 = boto3.client('s3')
+
+def get_ssm_parameter(param_name):
+    """Securely fetches API keys from AWS SSM Parameter Store."""
+    response = ssm.get_parameter(Name=param_name, WithDecryption=True)
+    return response['Parameter']['Value']
+
+def lambda_handler(event, context):
+    """
+    AWS Lambda entry point.
+    Fetches Manchester United stats from API-Football.
+    """
+    try:
+        # 1. Fetch our secure API Key
+        api_key = get_ssm_parameter("/manutd-ecosystem/ApiFootballKey")
+        
+        # Manchester United Team ID in API-Football is 33
+        team_id = "33"
+        season = "2023" # Current or target season
+        
+        # 2. Setup the request to API-Football
+        url = f"https://v3.football.api-sports.io/teams/statistics?season={season}&team={team_id}&league=39"
+        
+        req = urllib.request.Request(url)
+        req.add_header('x-rapidapi-key', api_key)
+        req.add_header('x-rapidapi-host', 'v3.football.api-sports.io')
+        
+        # 3. Execute request
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            
+        # 4. Clean the data to save tokens for Gemini later
+        # Stripping unnecessary nesting to keep the payload lightweight
+        clean_stats = {
+            "team": data["response"]["team"]["name"],
+            "form": data["response"]["form"],
+            "fixtures_played": data["response"]["fixtures"]["played"]["total"],
+            "wins": data["response"]["fixtures"]["wins"]["total"],
+            "draws": data["response"]["fixtures"]["draws"]["total"],
+            "loses": data["response"]["fixtures"]["loses"]["total"],
+            "goals_for": data["response"]["goals"]["for"]["total"]["total"],
+            "goals_against": data["response"]["goals"]["against"]["total"]["total"]
+        }
+        
+        print("Successfully fetched and cleaned stats:", json.dumps(clean_stats))
+        
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "message": "Successfully fetched Manchester United stats!",
+                "data": clean_stats
+            })
+        }
+        
+    except Exception as e:
+        print(f"Error fetching data: {str(e)}")
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": str(e)})
+        }
