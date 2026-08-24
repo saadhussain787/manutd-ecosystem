@@ -11,7 +11,7 @@ Resources:
       CodeUri: pipeline/src/
       Handler: fetch_stats.lambda_handler
       Runtime: python3.11
-      Timeout: 30
+      Timeout: 120
       MemorySize: 256
       Environment:
         Variables:
@@ -34,6 +34,7 @@ Resources:
               Resource: 
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/manutd-ecosystem/ApiFootballKey'
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/manutd-ecosystem/GeminiApiKey'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/AmplifyWebhookUrl'
 
   ManUtdDataBucket:
     Type: AWS::S3::Bucket

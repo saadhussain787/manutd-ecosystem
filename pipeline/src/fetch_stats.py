@@ -94,6 +94,15 @@ def lambda_handler(event, context):
         
         print(f"Successfully saved files to S3 bucket: {bucket_name}")
         
+        # 8. Trigger AWS Amplify Webhook to rebuild the frontend site
+        try:
+            webhook_url = get_ssm_parameter("AmplifyWebhookUrl")
+            req_webhook = urllib.request.Request(webhook_url, method='POST')
+            with urllib.request.urlopen(req_webhook) as response:
+                print(f"Triggered Amplify Webhook: {response.status}")
+        except Exception as webhook_err:
+            print(f"Warning: Failed to trigger webhook. Check parameter: {str(webhook_err)}")
+        
         return {
             "statusCode": 200,
             "body": json.dumps({

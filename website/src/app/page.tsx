@@ -1,5 +1,7 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import StatsDashboard from '@/components/StatsDashboard';
+import AffiliateBlock from '@/components/AffiliateBlock';
+import PremiumPaywall from '@/components/PremiumPaywall';
 
 // Check if we are running in Amplify (which uses our custom prefix to bypass AWS restrictions)
 const amplifyCredentials = process.env.MY_AWS_ACCESS_KEY_ID
@@ -50,6 +52,10 @@ export default async function Home() {
       </header>
       
       <StatsDashboard statsData={statsData} youtubeScript={finalScript} />
+      
+      <AffiliateBlock />
+      
+      <PremiumPaywall />
     </main>
   );
 }
