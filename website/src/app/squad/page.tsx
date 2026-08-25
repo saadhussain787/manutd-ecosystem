@@ -11,10 +11,10 @@ export default async function SquadPage() {
   const data = JSON.parse(fileContents);
 
   // Group squad by position
-  const positions = ['GK', 'DEF', 'MID', 'FWD'];
+  const positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker'];
   const groupedSquad = positions.map(pos => ({
-    name: pos === 'GK' ? 'Goalkeepers' : pos === 'DEF' ? 'Defenders' : pos === 'MID' ? 'Midfielders' : 'Forwards',
-    players: data.startingXI.filter((p: any) => p.position === pos)
+    name: pos === 'Goalkeeper' ? 'Goalkeepers' : pos === 'Defender' ? 'Defenders' : pos === 'Midfielder' ? 'Midfielders' : 'Forwards',
+    players: data.squad ? data.squad.filter((p: any) => p.position === pos) : []
   }));
 
   return (
@@ -27,12 +27,19 @@ export default async function SquadPage() {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {group.players.map((player: any) => (
-              <div key={player.number} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
-                <div className="relative h-48 bg-gray-100 flex items-end justify-center pt-4">
-                  {/* Fake player silhouette */}
-                  <div className="w-3/4 h-[90%] bg-gray-300 rounded-t-[50%] relative z-10 group-hover:scale-105 transition-transform duration-300"></div>
-                  <div className="absolute top-4 left-4 text-4xl font-black text-gray-200 z-0 tracking-tighter">
-                    {player.number}
+              <div key={player.id || player.number} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
+                <div className="relative h-56 bg-gray-100 flex items-end justify-center pt-4 overflow-hidden">
+                  {player.photo ? (
+                    <img 
+                      src={player.photo} 
+                      alt={player.name} 
+                      className="h-[120%] object-cover object-top relative z-10 group-hover:scale-105 transition-transform duration-300" 
+                    />
+                  ) : (
+                    <div className="w-3/4 h-[90%] bg-gray-300 rounded-t-[50%] relative z-10 group-hover:scale-105 transition-transform duration-300"></div>
+                  )}
+                  <div className="absolute top-4 left-4 text-5xl font-black text-gray-200 z-0 tracking-tighter">
+                    {player.number > 0 ? player.number : ''}
                   </div>
                 </div>
                 

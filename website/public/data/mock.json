@@ -1,106 +1,701 @@
 {
-  "manager": "R\u00faben Amorim",
+  "manager": "R. Nistelrooij",
   "season": "2024/25",
-  "leaguePosition": 1,
+  "leaguePosition": 15,
+  "table": [
+    {
+      "pos": 1,
+      "team": "Liverpool",
+      "played": 38,
+      "wins": 25,
+      "draws": 9,
+      "losses": 4,
+      "gd": 45,
+      "pts": 84,
+      "isManUtd": false
+    },
+    {
+      "pos": 2,
+      "team": "Arsenal",
+      "played": 38,
+      "wins": 20,
+      "draws": 14,
+      "losses": 4,
+      "gd": 35,
+      "pts": 74,
+      "isManUtd": false
+    },
+    {
+      "pos": 3,
+      "team": "Manchester City",
+      "played": 38,
+      "wins": 21,
+      "draws": 8,
+      "losses": 9,
+      "gd": 28,
+      "pts": 71,
+      "isManUtd": false
+    },
+    {
+      "pos": 4,
+      "team": "Chelsea",
+      "played": 38,
+      "wins": 20,
+      "draws": 9,
+      "losses": 9,
+      "gd": 21,
+      "pts": 69,
+      "isManUtd": false
+    },
+    {
+      "pos": 5,
+      "team": "Newcastle",
+      "played": 38,
+      "wins": 20,
+      "draws": 6,
+      "losses": 12,
+      "gd": 21,
+      "pts": 66,
+      "isManUtd": false
+    },
+    {
+      "pos": 6,
+      "team": "Aston Villa",
+      "played": 38,
+      "wins": 19,
+      "draws": 9,
+      "losses": 10,
+      "gd": 7,
+      "pts": 66,
+      "isManUtd": false
+    },
+    {
+      "pos": 7,
+      "team": "Nottingham Forest",
+      "played": 38,
+      "wins": 19,
+      "draws": 8,
+      "losses": 11,
+      "gd": 12,
+      "pts": 65,
+      "isManUtd": false
+    },
+    {
+      "pos": 8,
+      "team": "Brighton",
+      "played": 38,
+      "wins": 16,
+      "draws": 13,
+      "losses": 9,
+      "gd": 7,
+      "pts": 61,
+      "isManUtd": false
+    },
+    {
+      "pos": 9,
+      "team": "Bournemouth",
+      "played": 38,
+      "wins": 15,
+      "draws": 11,
+      "losses": 12,
+      "gd": 12,
+      "pts": 56,
+      "isManUtd": false
+    },
+    {
+      "pos": 10,
+      "team": "Brentford",
+      "played": 38,
+      "wins": 16,
+      "draws": 8,
+      "losses": 14,
+      "gd": 9,
+      "pts": 56,
+      "isManUtd": false
+    },
+    {
+      "pos": 11,
+      "team": "Fulham",
+      "played": 38,
+      "wins": 15,
+      "draws": 9,
+      "losses": 14,
+      "gd": 0,
+      "pts": 54,
+      "isManUtd": false
+    },
+    {
+      "pos": 12,
+      "team": "Crystal Palace",
+      "played": 38,
+      "wins": 13,
+      "draws": 14,
+      "losses": 11,
+      "gd": 0,
+      "pts": 53,
+      "isManUtd": false
+    },
+    {
+      "pos": 13,
+      "team": "Everton",
+      "played": 38,
+      "wins": 11,
+      "draws": 15,
+      "losses": 12,
+      "gd": -2,
+      "pts": 48,
+      "isManUtd": false
+    },
+    {
+      "pos": 14,
+      "team": "West Ham",
+      "played": 38,
+      "wins": 11,
+      "draws": 10,
+      "losses": 17,
+      "gd": -16,
+      "pts": 43,
+      "isManUtd": false
+    },
+    {
+      "pos": 15,
+      "team": "Manchester United",
+      "played": 38,
+      "wins": 11,
+      "draws": 9,
+      "losses": 18,
+      "gd": -10,
+      "pts": 42,
+      "isManUtd": true
+    },
+    {
+      "pos": 16,
+      "team": "Wolves",
+      "played": 38,
+      "wins": 12,
+      "draws": 6,
+      "losses": 20,
+      "gd": -15,
+      "pts": 42,
+      "isManUtd": false
+    },
+    {
+      "pos": 17,
+      "team": "Tottenham",
+      "played": 38,
+      "wins": 11,
+      "draws": 5,
+      "losses": 22,
+      "gd": -1,
+      "pts": 38,
+      "isManUtd": false
+    },
+    {
+      "pos": 18,
+      "team": "Leicester",
+      "played": 38,
+      "wins": 6,
+      "draws": 7,
+      "losses": 25,
+      "gd": -47,
+      "pts": 25,
+      "isManUtd": false
+    },
+    {
+      "pos": 19,
+      "team": "Ipswich",
+      "played": 38,
+      "wins": 4,
+      "draws": 10,
+      "losses": 24,
+      "gd": -46,
+      "pts": 22,
+      "isManUtd": false
+    },
+    {
+      "pos": 20,
+      "team": "Southampton",
+      "played": 38,
+      "wins": 2,
+      "draws": 6,
+      "losses": 30,
+      "gd": -60,
+      "pts": 12,
+      "isManUtd": false
+    }
+  ],
   "recentMatch": {
-    "opponent": "Hull City",
-    "opponentShort": "HUL",
-    "isHome": false,
-    "date": "Sat 22 Aug",
-    "time": "11:30",
-    "competition": "Premier League",
-    "score": "0-2",
-    "result": "L"
+    "opponent": "Leicester",
+    "opponentShort": "LEI",
+    "isHome": true,
+    "date": "Wed 30 Oct",
+    "time": "19:45",
+    "competition": "League Cup",
+    "score": "5-2",
+    "result": "W"
   },
-  "nextMatch": null,
-  "upcomingMatches": [],
+  "nextMatch": {
+    "opponent": "Chelsea",
+    "opponentShort": "CHE",
+    "isHome": true,
+    "date": "Sun 03 Nov",
+    "time": "16:30",
+    "competition": "Premier League"
+  },
+  "upcomingMatches": [
+    {
+      "opponent": "PAOK",
+      "opponentShort": "PAO",
+      "isHome": true,
+      "date": "Thu 07 Nov",
+      "time": "20:00",
+      "competition": "UEFA Europa League"
+    },
+    {
+      "opponent": "Leicester",
+      "opponentShort": "LEI",
+      "isHome": true,
+      "date": "Sun 10 Nov",
+      "time": "14:00",
+      "competition": "Premier League"
+    },
+    {
+      "opponent": "Ipswich",
+      "opponentShort": "IPS",
+      "isHome": false,
+      "date": "Sun 24 Nov",
+      "time": "16:30",
+      "competition": "Premier League"
+    },
+    {
+      "opponent": "Bodo/Glimt",
+      "opponentShort": "BOD",
+      "isHome": true,
+      "date": "Thu 28 Nov",
+      "time": "20:00",
+      "competition": "UEFA Europa League"
+    },
+    {
+      "opponent": "Everton",
+      "opponentShort": "EVE",
+      "isHome": true,
+      "date": "Sun 01 Dec",
+      "time": "13:30",
+      "competition": "Premier League"
+    }
+  ],
   "startingXI": [
     {
-      "name": "Heaton",
-      "number": 22,
-      "position": "GK"
-    },
-    {
-      "name": "Darlow",
-      "number": 12,
-      "position": "GK"
-    },
-    {
-      "name": "Lammens",
+      "name": "A. Bay\u0131nd\u0131r",
       "number": 1,
-      "position": "GK"
+      "position": "GK",
+      "grid": "1:1"
     },
     {
-      "name": "Mee",
-      "number": 45,
-      "position": "GK"
+      "name": "Diogo Dalot",
+      "number": 20,
+      "position": "DEF",
+      "grid": "2:4"
     },
     {
-      "name": "Maguire",
-      "number": 5,
-      "position": "DEF"
-    },
-    {
-      "name": "Shaw",
-      "number": 23,
-      "position": "DEF"
-    },
-    {
-      "name": "Mart\u00ednez",
-      "number": 6,
-      "position": "DEF"
-    },
-    {
-      "name": "Dalot",
-      "number": 2,
-      "position": "DEF"
-    },
-    {
-      "name": "de Ligt",
+      "name": "M. de Ligt",
       "number": 4,
-      "position": "DEF"
+      "position": "DEF",
+      "grid": "2:3"
     },
     {
-      "name": "Mazraoui",
+      "name": "V. Lindel\u00f6f",
+      "number": 2,
+      "position": "DEF",
+      "grid": "2:2"
+    },
+    {
+      "name": "Lisandro Mart\u00ednez",
+      "number": 6,
+      "position": "DEF",
+      "grid": "2:1"
+    },
+    {
+      "name": "M. Ugarte",
+      "number": 25,
+      "position": "MID",
+      "grid": "3:2"
+    },
+    {
+      "name": "Casemiro",
+      "number": 18,
+      "position": "MID",
+      "grid": "3:1"
+    },
+    {
+      "name": "M. Rashford",
+      "number": 10,
+      "position": "MID",
+      "grid": "4:3"
+    },
+    {
+      "name": "Bruno Fernandes",
+      "number": 8,
+      "position": "MID",
+      "grid": "4:2"
+    },
+    {
+      "name": "A. Garnacho",
+      "number": 17,
+      "position": "MID",
+      "grid": "4:1"
+    },
+    {
+      "name": "J. Zirkzee",
+      "number": 11,
+      "position": "FWD",
+      "grid": "5:1"
+    }
+  ],
+  "squad": [
+    {
+      "id": 18885,
+      "name": "K. Darlow",
+      "age": 35,
+      "number": 12,
+      "position": "Goalkeeper",
+      "photo": "https://media.api-sports.io/football/players/18885.png"
+    },
+    {
+      "id": 2931,
+      "name": "T. Heaton",
+      "age": 39,
+      "number": 22,
+      "position": "Goalkeeper",
+      "photo": "https://media.api-sports.io/football/players/2931.png"
+    },
+    {
+      "id": 162511,
+      "name": "S. Lammens",
+      "age": 23,
+      "number": 1,
+      "position": "Goalkeeper",
+      "photo": "https://media.api-sports.io/football/players/162511.png"
+    },
+    {
+      "id": 284382,
+      "name": "Dermot William Mee",
+      "age": 23,
+      "number": 45,
+      "position": "Goalkeeper",
+      "photo": "https://media.api-sports.io/football/players/284382.png"
+    },
+    {
+      "id": 403064,
+      "name": "H. Amass",
+      "age": 18,
+      "number": 41,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/403064.png"
+    },
+    {
+      "id": 546704,
+      "name": "D. Armer",
+      "age": 17,
+      "number": 69,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/546704.png"
+    },
+    {
+      "id": 886,
+      "name": "Diogo Dalot",
+      "age": 26,
+      "number": 2,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/886.png"
+    },
+    {
+      "id": 382452,
+      "name": "P. Dorgu",
+      "age": 21,
+      "number": 13,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/382452.png"
+    },
+    {
+      "id": 402329,
+      "name": "A. Heaven",
+      "age": 19,
+      "number": 26,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/402329.png"
+    },
+    {
+      "id": 402330,
+      "name": "J. Kamason",
+      "age": 19,
+      "number": 2,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/402330.png"
+    },
+    {
+      "id": 440159,
+      "name": "G. Kukonki",
+      "age": 17,
+      "number": 12,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/440159.png"
+    },
+    {
+      "id": 2935,
+      "name": "H. Maguire",
+      "age": 32,
+      "number": 5,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/2935.png"
+    },
+    {
+      "id": 2467,
+      "name": "Lisandro Mart\u00ednez",
+      "age": 27,
+      "number": 6,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/2467.png"
+    },
+    {
+      "id": 545,
+      "name": "N. Mazraoui",
+      "age": 28,
       "number": 3,
-      "position": "DEF"
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/545.png"
     },
     {
-      "name": "Yoro",
+      "id": 891,
+      "name": "L. Shaw",
+      "age": 30,
+      "number": 23,
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/891.png"
+    },
+    {
+      "id": 342970,
+      "name": "L. Yoro",
+      "age": 20,
       "number": 15,
-      "position": "DEF"
+      "position": "Defender",
+      "photo": "https://media.api-sports.io/football/players/342970.png"
+    },
+    {
+      "id": 305834,
+      "name": "Andrey Santos",
+      "age": 21,
+      "number": 17,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/305834.png"
+    },
+    {
+      "id": 284400,
+      "name": "Tobias Christopher Collyer",
+      "age": 21,
+      "number": 43,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/284400.png"
+    },
+    {
+      "id": 408896,
+      "name": "J. Devaney",
+      "age": 18,
+      "number": 8,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/408896.png"
+    },
+    {
+      "id": 1485,
+      "name": "Bruno Fernandes",
+      "age": 31,
+      "number": 8,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/1485.png"
+    },
+    {
+      "id": 383770,
+      "name": "J. Fletcher",
+      "age": 18,
+      "number": 38,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/383770.png"
+    },
+    {
+      "id": 557460,
+      "name": "T. Fletcher",
+      "age": 18,
+      "number": 39,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/557460.png"
+    },
+    {
+      "id": 303010,
+      "name": "Daniel Gore",
+      "age": 21,
+      "number": 8,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/303010.png"
+    },
+    {
+      "id": 284322,
+      "name": "K. Mainoo",
+      "age": 20,
+      "number": 37,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/284322.png"
+    },
+    {
+      "id": 344229,
+      "name": "J. Moorhouse",
+      "age": 20,
+      "number": 8,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/344229.png"
+    },
+    {
+      "id": 19220,
+      "name": "M. Mount",
+      "age": 26,
+      "number": 7,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/19220.png"
+    },
+    {
+      "id": 2926,
+      "name": "Y. Tielemans",
+      "age": 28,
+      "number": 18,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/2926.png"
+    },
+    {
+      "id": 51494,
+      "name": "M. Ugarte",
+      "age": 24,
+      "number": 25,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/51494.png"
+    },
+    {
+      "id": 1165,
+      "name": "Matheus Cunha",
+      "age": 26,
+      "number": 10,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/1165.png"
+    },
+    {
+      "id": 157997,
+      "name": "A. Diallo",
+      "age": 23,
+      "number": 16,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/157997.png"
+    },
+    {
+      "id": 588436,
+      "name": "Joseph Gabriel",
+      "age": 15,
+      "number": 77,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/588436.png"
+    },
+    {
+      "id": 557462,
+      "name": "S. Lacey",
+      "age": 18,
+      "number": 31,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/557462.png"
+    },
+    {
+      "id": 20589,
+      "name": "B. Mbeumo",
+      "age": 26,
+      "number": 19,
+      "position": "Midfielder",
+      "photo": "https://media.api-sports.io/football/players/20589.png"
+    },
+    {
+      "id": 389309,
+      "name": "O. Martin",
+      "age": 18,
+      "number": 16,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/389309.png"
+    },
+    {
+      "id": 909,
+      "name": "M. Rashford",
+      "age": 28,
+      "number": 9,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/909.png"
+    },
+    {
+      "id": 115589,
+      "name": "B. \u0160e\u0161ko",
+      "age": 22,
+      "number": 30,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/115589.png"
+    },
+    {
+      "id": 557391,
+      "name": "T. Thompson",
+      "age": 17,
+      "number": 27,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/557391.png"
+    },
+    {
+      "id": 362270,
+      "name": "E. Wheatley",
+      "age": 19,
+      "number": 27,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/362270.png"
+    },
+    {
+      "id": 70100,
+      "name": "J. Zirkzee",
+      "age": 24,
+      "number": 11,
+      "position": "Attacker",
+      "photo": "https://media.api-sports.io/football/players/70100.png"
     }
   ],
   "news": [
     {
       "title": "Man Utd latest: Why United could wait a year to sign desired left-back",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e1.365dm.com/26/08/1920x1080/skysports-man-utd-club-blog_7326703.jpg?20260820165515"
     },
     {
       "title": "Champions? Relegated? One to watch? Carra and Neville's season predictions!",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e1.365dm.com/26/08/1920x1080/skysports-carragher-neville_7330480.jpg?20260824231958"
     },
     {
       "title": "Are Man Utd better off waiting until next year to sign new left-back?",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e2.365dm.com/26/08/1920x1080/skysports-football-man-utd_7330168.jpg?20260824162312"
     },
     {
       "title": "Hits and misses: Man Utd lack guts and fight, but can Leeds dare to dream?",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e0.365dm.com/26/08/1920x1080/skysports-premier-league-hits-and-misses_7328560.jpg?20260822183501"
     },
     {
       "title": "Maguire-Mazraoui grappling mix-up - what happened in build-up to Hull opener?  ",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e2.365dm.com/26/08/1920x1080/skysports-football-premier-league_7328669.jpg?20260822201618"
     },
     {
       "title": "Don't panic! Why Man Utd and Carrick get a pass after flat Hull defeat",
       "category": "Latest News",
-      "image": "/images/news1.png"
+      "image": "https://e1.365dm.com/26/08/1920x1080/skysports-carrick-manchester-united_7330157.jpg?20260824160103"
     }
   ],
   "videos": [
@@ -110,7 +705,7 @@
       "image": "/images/vid1.png"
     },
     {
-      "title": "Press Conference: R\u00faben Amorim",
+      "title": "Press Conference Highlights",
       "duration": "15:30",
       "image": "/images/vid2.png"
     },
