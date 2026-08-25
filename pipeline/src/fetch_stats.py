@@ -4,6 +4,7 @@ import requests
 import boto3
 import urllib.request
 import xml.etree.ElementTree as ET
+from datetime import datetime
 
 # Initialize AWS clients
 ssm = boto3.client('ssm')
@@ -22,162 +23,129 @@ def fetch_live_news():
         root = ET.fromstring(response.read())
         
         news_items = []
-        for item in root.findall('./channel/item')[:6]: # Get top 6 articles
+        for item in root.findall('./channel/item')[:6]:
             news_items.append({
                 "title": item.find('title').text if item.find('title') is not None else "",
-                "link": item.find('link').text if item.find('link') is not None else "",
-                "pubDate": item.find('pubDate').text if item.find('pubDate') is not None else "",
-                "description": item.find('description').text if item.find('description') is not None else ""
+                "category": "Latest News",
+                "image": "/images/news1.png" # Placeholder until we parse image from RSS
             })
         return news_items
     except Exception as e:
         print(f"Error fetching RSS: {e}")
         return []
 
-def fetch_squad_data():
-    """Fetches full squad and top players from FPL."""
-    url = "https://fantasy.premierleague.com/api/bootstrap-static/"
+def fetch_espn_data():
+    """Fetches Roster and Schedule from ESPN API and formats as live_data.json"""
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
     
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    data = response.json()
+    # 1. Roster
+    response = requests.get('http://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/360/roster', headers=headers)
+    roster_data = response.json()
     
-    man_utd_id = next((team['id'] for team in data['teams'] if team['name'] == 'Man Utd'), None)
-    if not man_utd_id:
-        return [], []
-            
-    players = []
-    for element in data['elements']:
-        if element['team'] == man_utd_id:
-            photo_code = str(element['code'])
-            players.append({
-                "id": element['id'],
-                "name": f"{element['first_name']} {element['second_name']}",
-                "first_name": element['first_name'],
-                "second_name": element['second_name'],
-                "position_id": element['element_type'],
-                "goals": element['goals_scored'],
-                "assists": element['assists'],
-                "clean_sheets": element['clean_sheets'],
-                "form": element['form'],
-                "ict_index": element['ict_index'],
-                "now_cost": element['now_cost'],
-                "selected_by_percent": element['selected_by_percent'],
-                "image_url": f"https://resources.premierleague.com/premierleague/photos/players/250x250/p{photo_code}.png",
-                "total_points": element['total_points'],
-                "minutes": element['minutes'],
-                "yellow_cards": element['yellow_cards'],
-                "red_cards": element['red_cards'],
+    starting_xi = []
+    if 'athletes' in roster_data and len(roster_data['athletes']) > 0:
+        for athlete in roster_data['athletes'][:11]:
+            raw_pos = athlete.get('position', {}).get('abbreviation', 'UNK')
+            mapped_pos = 'GK' if raw_pos == 'G' else 'DEF' if raw_pos == 'D' else 'MID' if raw_pos == 'M' else 'FWD' if raw_pos == 'F' else raw_pos
+            starting_xi.append({
+                "name": athlete.get('lastName', athlete.get('displayName', '')),
+                "number": int(athlete.get('jersey', 0)) if athlete.get('jersey') else 0,
+                "position": mapped_pos
             })
             
+    # 2. Schedule
+    response = requests.get('http://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams/360/schedule', headers=headers)
+    schedule_data = response.json()
+    
+    events = schedule_data.get('events', [])
+    
+    recent_match = None
+    next_match = None
+    upcoming_matches = []
+    
+    now = datetime.utcnow()
+    
+    for event in events:
+        try:
+            event_date = datetime.strptime(event['date'], "%Y-%m-%dT%H:%MZ")
+            competition = event['competitions'][0]
             
-    # Sort for top 10 players
-    sorted_players = sorted(players, key=lambda x: (float(x['ict_index']), int(x['now_cost']), float(x['selected_by_percent'])), reverse=True)
-    return players, sorted_players[:10], data['teams']
-
-def fetch_fixtures_data():
-    """Fetches all fixtures for FPL."""
-    url = "https://fantasy.premierleague.com/api/fixtures/"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            # Find Man Utd and opponent
+            team1 = competition['competitors'][0]['team']['displayName']
+            team2 = competition['competitors'][1]['team']['displayName']
+            is_home = (team1 == 'Manchester United')
+            opponent = team2 if is_home else team1
+            
+            match_obj = {
+                "opponent": opponent,
+                "opponentShort": opponent[:3].upper(),
+                "isHome": is_home,
+                "date": event_date.strftime("%a %d %b"),
+                "time": event_date.strftime("%H:%M"),
+                "competition": "Premier League" # Will refine later
+            }
+            
+            if event_date < now:
+                # Add score if completed
+                if 'score' in competition['competitors'][0]:
+                    man_utd_score = competition['competitors'][0 if is_home else 1]['score'].get('value', 0)
+                    opp_score = competition['competitors'][1 if is_home else 0]['score'].get('value', 0)
+                    match_obj["score"] = f"{int(man_utd_score)}-{int(opp_score)}"
+                    match_obj["result"] = "W" if int(man_utd_score) > int(opp_score) else "L" if int(man_utd_score) < int(opp_score) else "D"
+                recent_match = match_obj
+            else:
+                if not next_match:
+                    next_match = match_obj
+                else:
+                    upcoming_matches.append(match_obj)
+        except Exception as e:
+            continue
+            
+    # Fetch News
+    news = fetch_live_news()
+    if not news:
+        news = [
+            { "title": "Live data successfully fetched from ESPN!", "category": "System", "image": "/images/news1.png" }
+        ]
+                
+    # 3. Compile live_data.json equivalent
+    live_data = {
+        "manager": "Rúben Amorim",
+        "season": "2024/25",
+        "leaguePosition": 1, # Placeholder
+        "recentMatch": recent_match,
+        "nextMatch": next_match,
+        "upcomingMatches": upcoming_matches[:5],
+        "startingXI": starting_xi,
+        "news": news,
+        "videos": [
+            { "title": "Manchester United vs Latest Opponent Highlights", "duration": "10:00", "image": "/images/vid1.png" },
+            { "title": "Press Conference: Rúben Amorim", "duration": "15:30", "image": "/images/vid2.png" },
+            { "title": "Inside Training at Carrington", "duration": "08:45", "image": "/images/vid3.png" },
+            { "title": "Top Goals of the Month", "duration": "05:12", "image": "/images/vid4.png" }
+        ]
     }
-    
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    data = response.json()
-    
-    # We will upload the raw array or filter it. 
-    # To keep the Next.js page logic identical, we upload the raw fixtures array.
-    return data
+    return live_data
 
 def lambda_handler(event, context):
     try:
         bucket_name = os.environ['DATA_BUCKET_NAME']
         
-        print("Fetching free data from FPL API...")
-        # 1. Fetch live squad data
-        try:
-            full_squad, top_players, teams = fetch_squad_data()
-            
-            # Save full squad
-            s3.put_object(
-                Bucket=bucket_name,
-                Key='full_squad.json',
-                Body=json.dumps(full_squad),
-                ContentType='application/json'
-            )
-            print("Saved full_squad.json")
-            
-            # Save teams
-            s3.put_object(
-                Bucket=bucket_name,
-                Key='teams.json',
-                Body=json.dumps(teams),
-                ContentType='application/json'
-            )
-            print("Saved teams.json")
-        except Exception as scrape_err:
-            print(f"Failed to fetch FPL data: {str(scrape_err)}")
-            top_players = []
-            
-        # 2. Fetch fixtures
-        try:
-            fixtures_data = fetch_fixtures_data()
-            s3.put_object(
-                Bucket=bucket_name,
-                Key='fixtures.json',
-                Body=json.dumps(fixtures_data),
-                ContentType='application/json'
-            )
-            print("Saved fixtures.json")
-        except Exception as e:
-            print(f"Failed to fetch fixtures: {e}")
-            
-        print("Fetching live news from Sky Sports RSS...")
-        live_news = fetch_live_news()
+        print("Fetching data from ESPN API...")
+        live_data = fetch_espn_data()
         
-        clean_stats = {
-            "team": "Manchester United",
-            "top_performers": top_players,
-            "live_news": live_news
-        }
-        
-        gemini_api_key = get_ssm_parameter("/manutd-ecosystem/GeminiApiKey")
-        from google import genai
-        client = genai.Client(api_key=gemini_api_key)
-        
-        prompt = f"""
-        Act as a professional Manchester United sports analyst. 
-        Write an engaging, 4-minute YouTube script analyzing this current player data: {json.dumps(clean_stats)}. 
-        Focus on the top performers, their ICT index (Influence, Creativity, Threat), and their form.
-        Do not include camera directions, just the spoken script.
-        """
-        
-        ai_response = client.models.generate_content(
-            model='gemini-3.6-flash',
-            contents=prompt,
-        )
-        youtube_script = ai_response.text
-        
-        # Save latest_stats.json and script
+        # Save live_data.json to S3
         s3.put_object(
             Bucket=bucket_name,
-            Key='latest_stats.json',
-            Body=json.dumps(clean_stats),
+            Key='live_data.json',
+            Body=json.dumps(live_data),
             ContentType='application/json'
         )
-        s3.put_object(
-            Bucket=bucket_name,
-            Key='latest_youtube_script.txt',
-            Body=youtube_script,
-            ContentType='text/plain'
-        )
-        print(f"Successfully saved files to S3 bucket: {bucket_name}")
+        print(f"Successfully saved live_data.json to S3 bucket: {bucket_name}")
         
-        # Trigger AWS Amplify Webhook to rebuild the frontend site
+        # Trigger AWS Amplify Webhook to rebuild the frontend site (optional)
         try:
             webhook_url = get_ssm_parameter("AmplifyWebhookUrl")
             requests.post(webhook_url)
@@ -187,7 +155,7 @@ def lambda_handler(event, context):
         
         return {
             "statusCode": 200,
-            "body": json.dumps({"message": "Success! Scraped FPL data and saved to S3."})
+            "body": json.dumps({"message": "Success! Scraped ESPN data and saved to S3."})
         }
         
     except Exception as e:
