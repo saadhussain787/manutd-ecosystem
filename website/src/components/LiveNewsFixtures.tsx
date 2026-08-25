@@ -1,7 +1,24 @@
 "use client";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function LiveNewsFixtures() {
+  const [fixtures, setFixtures] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/fixtures')
+      .then(res => res.json())
+      .then(data => {
+        setFixtures(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load fixtures", err);
+        setLoading(false);
+      });
+  }, []);
+
   const newsItems = [
     { id: 1, title: "Ten Hag praises team resilience in pre-match presser", time: "2 hrs ago", tag: "Interview" },
     { id: 2, title: "Injury Update: Key defenders return to full training", time: "5 hrs ago", tag: "Squad" },
@@ -38,7 +55,7 @@ export default function LiveNewsFixtures() {
         </div>
       </motion.div>
 
-      {/* Match Center: Hull City */}
+      {/* Match Center: Dynamic */}
       <motion.div 
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -47,47 +64,61 @@ export default function LiveNewsFixtures() {
       >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-utd-red via-utd-gold to-utd-red"></div>
         <h2 className="text-gray-400 font-heading text-sm uppercase tracking-widest mb-2">Previous Match</h2>
-        <p className="text-xs text-gray-500 mb-6 font-body">Carabao Cup - 3rd Round</p>
         
-        <div className="flex items-center justify-between w-full px-4 mb-8">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center border-2 border-utd-red shadow-[0_0_15px_rgba(218,41,28,0.5)]">
-              <span className="font-heading text-xl font-bold">MUN</span>
+        {loading ? (
+          <div className="animate-pulse flex flex-col items-center h-full justify-center text-gray-400">
+            Loading Live Fixture Data...
+          </div>
+        ) : fixtures?.lastMatch ? (
+          <>
+            <p className="text-xs text-gray-500 mb-6 font-body">Premier League - GW {fixtures.lastMatch.event}</p>
+            
+            <div className="flex items-center justify-between w-full px-4 mb-8">
+              <div className="flex flex-col items-center gap-2">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 shadow-[0_0_15px_rgba(218,41,28,0.5)] ${fixtures.lastMatch.team_h === 16 ? 'bg-white/10 border-utd-red' : 'bg-white/5 border-gray-600'}`}>
+                  <span className={`font-heading text-xl font-bold ${fixtures.lastMatch.team_h === 16 ? 'text-white' : 'text-gray-300'}`}>
+                    {fixtures.teams?.[fixtures.lastMatch.team_h]?.toUpperCase().substring(0,3) || 'H'}
+                  </span>
+                </div>
+                <span className={`text-sm font-bold ${fixtures.lastMatch.team_h === 16 ? 'text-white' : 'text-gray-300'}`}>
+                  {fixtures.teams?.[fixtures.lastMatch.team_h] || 'Home'}
+                </span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <span className="text-4xl font-heading font-bold text-white bg-white/10 px-4 py-2 rounded-lg">
+                  {fixtures.lastMatch.team_h_score} - {fixtures.lastMatch.team_a_score}
+                </span>
+                <span className="text-xs text-utd-gold mt-2">FT</span>
+              </div>
+              
+              <div className="flex flex-col items-center gap-2">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 shadow-[0_0_15px_rgba(218,41,28,0.5)] ${fixtures.lastMatch.team_a === 16 ? 'bg-white/10 border-utd-red' : 'bg-white/5 border-gray-600'}`}>
+                  <span className={`font-heading text-xl font-bold ${fixtures.lastMatch.team_a === 16 ? 'text-white' : 'text-gray-300'}`}>
+                    {fixtures.teams?.[fixtures.lastMatch.team_a]?.toUpperCase().substring(0,3) || 'A'}
+                  </span>
+                </div>
+                <span className={`text-sm font-bold ${fixtures.lastMatch.team_a === 16 ? 'text-white' : 'text-gray-300'}`}>
+                  {fixtures.teams?.[fixtures.lastMatch.team_a] || 'Away'}
+                </span>
+              </div>
             </div>
-            <span className="text-sm font-bold">Man Utd</span>
-          </div>
-          
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-heading font-bold text-white bg-white/10 px-4 py-2 rounded-lg">3 - 1</span>
-            <span className="text-xs text-utd-gold mt-2">FT</span>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center border-2 border-gray-600">
-              <span className="font-heading text-xl font-bold text-gray-300">HUL</span>
-            </div>
-            <span className="text-sm font-bold text-gray-300">Hull City</span>
-          </div>
-        </div>
 
-        <div className="w-full text-sm font-body text-gray-300 border-t border-white/10 pt-4 flex flex-col gap-1">
-          <div className="flex justify-between w-full">
-            <span>Fernandes 24'</span>
-            <span></span>
+            {fixtures.nextMatch && (
+              <div className="w-full text-sm font-body text-gray-300 border-t border-white/10 pt-4 flex flex-col gap-1">
+                <span className="text-xs text-utd-gold uppercase tracking-wider mb-2">Next Match</span>
+                <div className="flex justify-between w-full">
+                  <span>vs {fixtures.teams?.[fixtures.nextMatch.team_h === 16 ? fixtures.nextMatch.team_a : fixtures.nextMatch.team_h]}</span>
+                  <span>{new Date(fixtures.nextMatch.kickoff_time).toLocaleDateString()}</span>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            No match data available
           </div>
-          <div className="flex justify-between w-full">
-            <span>Rashford 55'</span>
-            <span></span>
-          </div>
-          <div className="flex justify-between w-full">
-            <span></span>
-            <span>Philogene 68'</span>
-          </div>
-          <div className="flex justify-between w-full">
-            <span>Garnacho 89'</span>
-            <span></span>
-          </div>
-        </div>
+        )}
       </motion.div>
     </div>
   );
