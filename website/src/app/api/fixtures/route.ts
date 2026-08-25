@@ -31,13 +31,7 @@ export async function GET() {
     const lastMatch = pastMatches.length > 0 ? pastMatches[pastMatches.length - 1] : null;
     const nextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null;
 
-    let teamMap: Record<number, string> = {};
-    if (bootstrapResponse.ok) {
-        const bootstrapData = await bootstrapResponse.json();
-        bootstrapData.teams.forEach((t: any) => {
-            teamMap[t.id] = t.short_name;
-        });
-    }
+
     
     return NextResponse.json({
       lastMatch,
