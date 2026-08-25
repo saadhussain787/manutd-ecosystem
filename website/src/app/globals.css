@@ -25,7 +25,7 @@
   .bg-sir-alex {
     background-image: linear-gradient(to bottom, rgba(17, 17, 17, 0.15), rgba(17, 17, 17, 0.6)), url('/sir_alex_background.jpg');
     background-size: cover;
-    background-position: center top;
+    background-position: center bottom;
     background-attachment: fixed;
   }
 }

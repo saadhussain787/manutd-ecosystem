@@ -32,8 +32,9 @@ async function getFixtures() {
 
   const muFixtures = fixtures.filter((f: any) => f.team_h === manUtdId || f.team_a === manUtdId);
 
-  const pastMatches = muFixtures.filter((f: any) => f.finished).reverse(); // Most recent first
-  const upcomingMatches = muFixtures.filter((f: any) => !f.finished); // Next match first
+  const isFinished = (f: any) => f.finished || f.finished_provisional;
+  const pastMatches = muFixtures.filter(isFinished).reverse(); // Most recent first
+  const upcomingMatches = muFixtures.filter((f: any) => !isFinished(f)); // Next match first
 
   return { pastMatches, upcomingMatches, teamMap, manUtdId };
 }

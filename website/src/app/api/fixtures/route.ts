@@ -18,12 +18,13 @@ export async function GET() {
     // 16 is Manchester United's FPL ID in this simulation
     const muFixtures = data.filter((f: any) => f.team_h === 16 || f.team_a === 16);
     
-    // Find the latest finished match
-    const finishedMatches = muFixtures.filter((f: any) => f.finished);
+    // Find the latest finished match (including provisional finish)
+    const isFinished = (f: any) => f.finished || f.finished_provisional;
+    const finishedMatches = muFixtures.filter(isFinished);
     const lastMatch = finishedMatches.length > 0 ? finishedMatches[finishedMatches.length - 1] : null;
     
     // Find the next upcoming match
-    const upcomingMatches = muFixtures.filter((f: any) => !f.finished);
+    const upcomingMatches = muFixtures.filter((f: any) => !isFinished(f));
     const nextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null;
 
     // Fetch bootstrap-static to get team names
