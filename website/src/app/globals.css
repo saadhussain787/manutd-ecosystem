@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #111111;
   --charcoal: #111111;
   --utd-red: #DA291C;
   --utd-gold: #FBE122;
@@ -21,12 +21,6 @@
 @layer utilities {
   .glass-card {
     @apply bg-charcoal/60 backdrop-blur-md border border-white/10 shadow-lg rounded-xl;
-  }
-  .bg-sir-alex {
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(17,17,17,1)), url('/sir_alex_background.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-attachment: fixed;
   }
 }
 

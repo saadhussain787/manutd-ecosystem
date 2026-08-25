@@ -1,0 +1,59 @@
+{
+  "manager": "Michael Carrick",
+  "season": "2026/27",
+  "leaguePosition": 17,
+  "recentMatch": {
+    "opponent": "Hull City",
+    "opponentShort": "HUL",
+    "isHome": false,
+    "score": "2-0",
+    "result": "L",
+    "date": "Sat 22 Aug",
+    "competition": "Premier League"
+  },
+  "nextMatch": {
+    "opponent": "Ipswich Town",
+    "opponentShort": "IPS",
+    "isHome": true,
+    "time": "16:30",
+    "date": "Sun 30 Aug",
+    "competition": "Premier League"
+  },
+  "upcomingMatches": [
+    { "opponent": "Coventry City", "isHome": false, "date": "Sat 1 May", "time": "15:00" },
+    { "opponent": "Bournemouth", "isHome": false, "date": "Sat 8 May", "time": "15:00" },
+    { "opponent": "Leeds United", "isHome": true, "date": "Sat 15 May", "time": "15:00" },
+    { "opponent": "Tottenham Hotspur", "isHome": false, "date": "Sun 23 May", "time": "15:00" },
+    { "opponent": "Fulham", "isHome": true, "date": "Sun 30 May", "time": "16:00" }
+  ],
+  "startingXI": [
+    { "name": "Lammens", "number": 1, "position": "GK" },
+    { "name": "Mazraoui", "number": 3, "position": "DEF" },
+    { "name": "Maguire", "number": 5, "position": "DEF" },
+    { "name": "Heaven", "number": 26, "position": "DEF" },
+    { "name": "Shaw", "number": 23, "position": "DEF" },
+    { "name": "Tielemans", "number": 18, "position": "MID" },
+    { "name": "Santos", "number": 17, "position": "MID" },
+    { "name": "Mbeumo", "number": 19, "position": "MID" },
+    { "name": "Fernandes", "number": 8, "position": "MID" },
+    { "name": "Dorgu", "number": 13, "position": "MID" },
+    { "name": "Cunha", "number": 10, "position": "FWD" }
+  ],
+  "news": [
+    { "title": "Report: U21s v Ipswich", "category": "Match Report", "image": "/images/news1.png" },
+    { "title": "Wheatley heads out on loan", "category": "Transfer News", "image": "/images/news2.png" },
+    { "title": "Women's U16s celebrate national silverware", "category": "Academy", "image": "/images/news3.png" },
+    { "title": "Match preview: United v Ipswich Town", "category": "First Team", "image": "/images/news4.png" },
+    { "title": "Who Am I? Play new daily Premier League GAME", "category": "Mini Games", "image": "/images/news5.png" },
+    { "title": "Academy action live on MUTV", "category": "Academy", "image": "/images/news6.png" },
+    { "title": "Every Premier League club's biggest deals in summer transfer window", "category": "Features", "image": "/images/news7.png" },
+    { "title": "Loan news: Devaney joins Hibernian", "category": "Transfer News", "image": "/images/news8.png" },
+    { "title": "Olid: We need to be sharper", "category": "First Team", "image": "/images/news9.png" }
+  ],
+  "videos": [
+    { "title": "Carrick 'encouraged' before tough Hull City trip", "duration": "05:12", "image": "/images/vid1.png" },
+    { "title": "Manchester United v Aston Villa | 2025-26 | 20 Minute Highlights", "duration": "20:01", "image": "/images/vid2.png" },
+    { "title": "Manchester United 1998/99 | Greatest ever teams in PL history", "duration": "14:33", "image": "/images/vid3.png" },
+    { "title": "Manchester United v Brentford | 2025-26 | 20 Minute Highlights", "duration": "20:00", "image": "/images/vid4.png" }
+  ]
+}

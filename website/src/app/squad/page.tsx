@@ -1,103 +1,57 @@
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { fetchFromS3 } from '@/lib/s3';
+import { promises as fs } from 'fs';
+import path from 'path';
 
-export const revalidate = 3600; // Cache for 1 hour
-
-async function getSquadData() {
-  const rawSquad = await fetchFromS3('full_squad.json');
-  if (!rawSquad) return [];
-  
-  const players = JSON.parse(rawSquad);
-  
-  // Sort players by ICT index
-  players.sort((a: any, b: any) => parseFloat(b.ict_index) - parseFloat(a.ict_index));
-
-  return players;
-}
+export const metadata = {
+  title: 'Squad | Manchester United',
+};
 
 export default async function SquadPage() {
-  const squad = await getSquadData();
+  const dataPath = path.join(process.cwd(), 'public/data/mock.json');
+  const fileContents = await fs.readFile(dataPath, 'utf8');
+  const data = JSON.parse(fileContents);
 
-  const getPositionName = (id: number) => {
-    switch (id) {
-      case 1: return "Goalkeepers";
-      case 2: return "Defenders";
-      case 3: return "Midfielders";
-      case 4: return "Forwards";
-      default: return "Unknown";
-    }
-  };
-
-  const groupedSquad = [1, 2, 3, 4].map(posId => ({
-    name: getPositionName(posId),
-    players: squad.filter((p: any) => p.position_id === posId)
+  // Group squad by position
+  const positions = ['GK', 'DEF', 'MID', 'FWD'];
+  const groupedSquad = positions.map(pos => ({
+    name: pos === 'GK' ? 'Goalkeepers' : pos === 'DEF' ? 'Defenders' : pos === 'MID' ? 'Midfielders' : 'Forwards',
+    players: data.startingXI.filter((p: any) => p.position === pos)
   }));
 
   return (
-    <main className="min-h-screen bg-sir-alex text-white flex flex-col font-sans">
-      <Navbar />
-      
-      <div className="flex-grow pt-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        <div className="mb-12 border-b border-utd-red pb-6">
-          <h1 className="text-5xl font-heading font-bold uppercase tracking-wider text-utd-gold mb-4 drop-shadow-[0_0_15px_rgba(251,225,34,0.5)]">
-            Manchester United Squad
-          </h1>
-          <p className="text-xl text-gray-300 font-body">Comprehensive player analytics, real-time FPL data, and performance metrics for the 2026/27 season.</p>
-        </div>
-
-        {groupedSquad.map(group => group.players.length > 0 && (
-          <section key={group.name} className="mb-16">
-            <h2 className="text-3xl font-heading uppercase text-white mb-8 border-l-4 border-utd-red pl-4">
-              {group.name}
-            </h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {group.players.map((player: any) => (
-                <div key={player.id} className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300">
-                  <div className="relative h-64 bg-gradient-to-t from-black to-transparent flex items-end justify-center pt-4">
-                    <img 
-                      src={player.image_url} 
-                      alt={`${player.first_name} ${player.second_name}`}
-                      className="h-full object-contain relative z-10"
-                    />
-                    <div className="absolute top-4 right-4 bg-utd-red text-white font-bold px-3 py-1 rounded-lg text-sm z-20 shadow-lg border border-utd-gold/30">
-                      £{(player.now_cost / 10).toFixed(1)}m
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 border-t border-white/10 bg-black/50">
-                    <h3 className="text-xl font-heading font-bold uppercase truncate">
-                      {player.first_name} <span className="text-utd-gold">{player.second_name}</span>
-                    </h3>
-                    
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">ICT Index</span>
-                        <span className="text-lg font-bold">{player.ict_index}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Form</span>
-                        <span className="text-lg font-bold">{player.form}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Pts</span>
-                        <span className="text-lg font-bold text-green-400">{player.total_points}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-400 uppercase tracking-wider">Selected</span>
-                        <span className="text-lg font-bold">{player.selected_by_percent}%</span>
-                      </div>
-                    </div>
+    <div className="w-full flex flex-col gap-12">
+      {groupedSquad.map(group => group.players.length > 0 && (
+        <section key={group.name} className="w-full">
+          <h2 className="text-2xl font-bold font-oswald mb-6 pb-2 border-b border-gray-200">
+            {group.name}
+          </h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {group.players.map((player: any) => (
+              <div key={player.number} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
+                <div className="relative h-48 bg-gray-100 flex items-end justify-center pt-4">
+                  {/* Fake player silhouette */}
+                  <div className="w-3/4 h-[90%] bg-gray-300 rounded-t-[50%] relative z-10 group-hover:scale-105 transition-transform duration-300"></div>
+                  <div className="absolute top-4 left-4 text-4xl font-black text-gray-200 z-0 tracking-tighter">
+                    {player.number}
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
-
-      <Footer />
-    </main>
+                
+                <div className="p-4 border-t border-gray-100 relative">
+                   <div className="absolute top-0 right-4 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                      {/* Flag placeholder */}
+                      <div className="w-full h-full bg-blue-600"></div>
+                   </div>
+                   
+                   <div className="font-bold text-gray-500 text-xs mb-1">{player.name.split(' ')[0]}</div>
+                   <h3 className="text-xl font-heading font-black uppercase tracking-tight text-gray-900 leading-none">
+                     {player.name}
+                   </h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
   );
 }
