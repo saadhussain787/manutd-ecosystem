@@ -11,10 +11,7 @@ export default function ClubNav() {
     { name: 'Video', href: '/video' },
     { name: 'Matches', href: '/matches' },
     { name: 'Squad', href: '/squad' },
-    { name: 'Stats', href: '/stats' },
-    { name: 'Stadium', href: '/stadium' },
-    { name: 'Tickets', href: '/tickets' },
-    { name: 'Directory', href: '/directory' }
+    { name: 'Stats', href: '/stats' }
   ];
 
   return (

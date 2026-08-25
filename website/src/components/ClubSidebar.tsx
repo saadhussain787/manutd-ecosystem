@@ -52,20 +52,6 @@ export default function ClubSidebar() {
         </Link>
       </div>
 
-      {/* Buy Tickets Links */}
-      <div className="flex flex-col gap-3 mt-4">
-        <h3 className="font-bold text-gray-800">Buy Man Utd Tickets</h3>
-        <Link href="#" className="border border-gray-300 rounded-full py-2.5 px-4 text-center text-sm font-bold text-gray-700 hover:border-[#DA291C] hover:text-[#DA291C] transition-colors">
-          Buy Tickets
-        </Link>
-        <Link href="#" className="border border-gray-300 rounded-full py-2.5 px-4 text-center text-sm font-bold text-gray-700 hover:border-[#DA291C] hover:text-[#DA291C] transition-colors">
-          Buy Matchday Hospitality
-        </Link>
-        <Link href="#" className="border border-gray-300 rounded-full py-2.5 px-4 text-center text-sm font-bold text-gray-700 hover:border-[#DA291C] hover:text-[#DA291C] transition-colors">
-          Club Ticket Information
-        </Link>
-      </div>
-
       {/* Socials */}
       <div className="mt-4">
         <h3 className="font-bold text-gray-800 mb-3">Club Socials</h3>
