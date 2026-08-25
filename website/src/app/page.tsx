@@ -109,18 +109,26 @@ export default async function OverviewPage() {
         {/* Next Match Card */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <h2 className="text-xl font-bold font-oswald mb-6">Next Match</h2>
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-bold text-gray-800">Man Utd</span>
-            <div className="w-10 h-10 bg-[#DA291C] rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md">MUN</div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-black text-[#38003c]">{nextMatch.time}</span>
+          {nextMatch ? (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-bold text-gray-800">Man Utd</span>
+                <div className="w-10 h-10 bg-[#DA291C] rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md">MUN</div>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-black text-[#38003c]">{nextMatch.time}</span>
+                </div>
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md">IPS</div>
+                <span className="font-bold text-gray-800">{nextMatch.opponent}</span>
+              </div>
+              <div className="text-center text-xs text-gray-400 font-bold uppercase tracking-widest mt-6">
+                Premier League • {nextMatch.date}
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-sm font-bold text-gray-500 py-8">
+              No upcoming matches scheduled.
             </div>
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-md">IPS</div>
-            <span className="font-bold text-gray-800">{nextMatch.opponent}</span>
-          </div>
-          <div className="text-center text-xs text-gray-400 font-bold uppercase tracking-widest mt-6">
-            Premier League • {nextMatch.date}
-          </div>
+          )}
         </div>
 
         {/* Team Form */}

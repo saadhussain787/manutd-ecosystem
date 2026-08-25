@@ -15,22 +15,28 @@ export default async function MatchesPage() {
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl font-bold font-oswald mb-6">Upcoming Matches</h2>
         <div className="flex flex-col gap-4">
-          <div className="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-             <div className="flex flex-col items-center sm:items-start text-sm">
-               <span className="font-bold text-gray-500">Premier League</span>
-               <span className="font-bold">{data.nextMatch.date} • {data.nextMatch.time}</span>
-             </div>
-             <div className="flex items-center gap-4">
-               <span className="font-bold text-lg w-24 text-right">Man Utd</span>
-               <div className="w-10 h-10 bg-[#DA291C] rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">MUN</div>
-               <span className="text-gray-400 font-bold px-2">v</span>
-               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">IPS</div>
-               <span className="font-bold text-lg w-24">{data.nextMatch.opponent}</span>
-             </div>
-             <div className="w-full sm:w-auto mt-2 sm:mt-0">
-               <button className="w-full sm:w-auto bg-[#DA291C] text-white font-bold px-4 py-2 rounded-full text-sm">Tickets</button>
-             </div>
-          </div>
+          {data.nextMatch ? (
+            <div className="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+               <div className="flex flex-col items-center sm:items-start text-sm">
+                 <span className="font-bold text-gray-500">Premier League</span>
+                 <span className="font-bold">{data.nextMatch.date} • {data.nextMatch.time}</span>
+               </div>
+               <div className="flex items-center gap-4">
+                 <span className="font-bold text-lg w-24 text-right">Man Utd</span>
+                 <div className="w-10 h-10 bg-[#DA291C] rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">MUN</div>
+                 <span className="text-gray-400 font-bold px-2">v</span>
+                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">IPS</div>
+                 <span className="font-bold text-lg w-24">{data.nextMatch.opponent}</span>
+               </div>
+               <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                 <button className="w-full sm:w-auto bg-[#DA291C] text-white font-bold px-4 py-2 rounded-full text-sm">Tickets</button>
+               </div>
+            </div>
+          ) : (
+            <div className="text-center text-sm font-bold text-gray-500 py-4">
+              No upcoming matches scheduled.
+            </div>
+          )}
           
           {data.upcomingMatches.map((match: any, index: number) => (
             <div key={index} className="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
