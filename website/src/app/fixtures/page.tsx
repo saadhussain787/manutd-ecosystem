@@ -1,32 +1,27 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { fetchFromS3 } from '@/lib/s3';
 
 export const revalidate = 3600; // Cache for 1 hour
 
 async function getFixtures() {
-  const [fixturesRes, teamsRes] = await Promise.all([
-    fetch('https://fantasy.premierleague.com/api/fixtures/', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      next: { revalidate: 3600 }
-    }),
-    fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      cache: 'no-store'
-    })
+  const [fixturesRaw, teamsRaw] = await Promise.all([
+    fetchFromS3('fixtures.json'),
+    fetchFromS3('teams.json')
   ]);
 
-  if (!fixturesRes.ok || !teamsRes.ok) {
-    throw new Error('Failed to fetch fixtures data');
+  if (!fixturesRaw || !teamsRaw) {
+    return { pastMatches: [], upcomingMatches: [], teamMap: {}, manUtdId: 16 };
   }
 
-  const fixtures = await fixturesRes.json();
-  const bootstrap = await teamsRes.json();
+  const fixtures = JSON.parse(fixturesRaw);
+  const teams = JSON.parse(teamsRaw);
   
   // Find Manchester United ID
-  const manUtdId = bootstrap.teams.find((t: any) => t.name === 'Man Utd')?.id || 16;
+  const manUtdId = teams.find((t: any) => t.name === 'Man Utd')?.id || 16;
   
   const teamMap: Record<number, any> = {};
-  bootstrap.teams.forEach((t: any) => {
+  teams.forEach((t: any) => {
     teamMap[t.id] = { name: t.name, short_name: t.short_name };
   });
 

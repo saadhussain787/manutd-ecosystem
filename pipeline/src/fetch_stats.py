@@ -34,11 +34,10 @@ def fetch_live_news():
         print(f"Error fetching RSS: {e}")
         return []
 
-def fetch_fpl_data():
-    """Fetches Manchester United player data from the free Official FPL API."""
+def fetch_squad_data():
+    """Fetches full squad and top players from FPL."""
     url = "https://fantasy.premierleague.com/api/bootstrap-static/"
     headers = {
-        # FPL API requires a User-Agent to prevent blocking
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
     
@@ -46,46 +45,96 @@ def fetch_fpl_data():
     response.raise_for_status()
     data = response.json()
     
-    # Find Manchester United's Team ID (usually 14)
-    man_utd_id = None
-    for team in data['teams']:
-        if team['name'] == 'Man Utd':
-            man_utd_id = team['id']
-            break
+    man_utd_id = next((team['id'] for team in data['teams'] if team['name'] == 'Man Utd'), None)
+    if not man_utd_id:
+        return [], []
             
-    # Extract all Man Utd players
     players = []
     for element in data['elements']:
         if element['team'] == man_utd_id:
-            # The FPL API uses the 'code' for the high-res image
             photo_code = str(element['code'])
             players.append({
+                "id": element['id'],
                 "name": f"{element['first_name']} {element['second_name']}",
+                "first_name": element['first_name'],
+                "second_name": element['second_name'],
                 "position_id": element['element_type'],
                 "goals": element['goals_scored'],
                 "assists": element['assists'],
                 "clean_sheets": element['clean_sheets'],
                 "form": element['form'],
-                "ict_index": element['ict_index'], # Influence, Creativity, Threat
+                "ict_index": element['ict_index'],
                 "now_cost": element['now_cost'],
                 "selected_by_percent": element['selected_by_percent'],
-                "image_url": f"https://resources.premierleague.com/premierleague/photos/players/250x250/p{photo_code}.png"
+                "image_url": f"https://resources.premierleague.com/premierleague/photos/players/250x250/p{photo_code}.png",
+                "total_points": element['total_points'],
+                "minutes": element['minutes'],
+                "yellow_cards": element['yellow_cards'],
+                "red_cards": element['red_cards'],
             })
             
-    # Sort players by ICT index descending. Since preseason ICT is 0.0, fallback to cost and popularity
-    players.sort(key=lambda x: (float(x['ict_index']), int(x['now_cost']), float(x['selected_by_percent'])), reverse=True)
-    return players[:10] # Return top 10 players to save AI token limits
+            
+    # Sort for top 10 players
+    sorted_players = sorted(players, key=lambda x: (float(x['ict_index']), int(x['now_cost']), float(x['selected_by_percent'])), reverse=True)
+    return players, sorted_players[:10], data['teams']
+
+def fetch_fixtures_data():
+    """Fetches all fixtures for FPL."""
+    url = "https://fantasy.premierleague.com/api/fixtures/"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    
+    # We will upload the raw array or filter it. 
+    # To keep the Next.js page logic identical, we upload the raw fixtures array.
+    return data
 
 def lambda_handler(event, context):
-    """AWS Lambda entry point for the $0 Data Engine."""
     try:
+        bucket_name = os.environ['DATA_BUCKET_NAME']
+        
         print("Fetching free data from FPL API...")
         # 1. Fetch live squad data
         try:
-            top_players = fetch_fpl_data()
+            full_squad, top_players, teams = fetch_squad_data()
+            
+            # Save full squad
+            s3.put_object(
+                Bucket=bucket_name,
+                Key='full_squad.json',
+                Body=json.dumps(full_squad),
+                ContentType='application/json'
+            )
+            print("Saved full_squad.json")
+            
+            # Save teams
+            s3.put_object(
+                Bucket=bucket_name,
+                Key='teams.json',
+                Body=json.dumps(teams),
+                ContentType='application/json'
+            )
+            print("Saved teams.json")
         except Exception as scrape_err:
             print(f"Failed to fetch FPL data: {str(scrape_err)}")
             top_players = []
+            
+        # 2. Fetch fixtures
+        try:
+            fixtures_data = fetch_fixtures_data()
+            s3.put_object(
+                Bucket=bucket_name,
+                Key='fixtures.json',
+                Body=json.dumps(fixtures_data),
+                ContentType='application/json'
+            )
+            print("Saved fixtures.json")
+        except Exception as e:
+            print(f"Failed to fetch fixtures: {e}")
             
         print("Fetching live news from Sky Sports RSS...")
         live_news = fetch_live_news()
@@ -96,13 +145,10 @@ def lambda_handler(event, context):
             "live_news": live_news
         }
         
-        # 2. Fetch Gemini API Key & Initialize AI
         gemini_api_key = get_ssm_parameter("/manutd-ecosystem/GeminiApiKey")
-        
         from google import genai
         client = genai.Client(api_key=gemini_api_key)
         
-        # 3. Generate the YouTube Script using the FPL data
         prompt = f"""
         Act as a professional Manchester United sports analyst. 
         Write an engaging, 4-minute YouTube script analyzing this current player data: {json.dumps(clean_stats)}. 
@@ -115,20 +161,14 @@ def lambda_handler(event, context):
             contents=prompt,
         )
         youtube_script = ai_response.text
-        print("Generated YouTube Script Successfully!")
         
-        # 4. Save data and script to our secure S3 Bucket
-        bucket_name = os.environ['DATA_BUCKET_NAME']
-        
-        # Save cleaned JSON stats
+        # Save latest_stats.json and script
         s3.put_object(
             Bucket=bucket_name,
             Key='latest_stats.json',
             Body=json.dumps(clean_stats),
             ContentType='application/json'
         )
-        
-        # Save generated YouTube script
         s3.put_object(
             Bucket=bucket_name,
             Key='latest_youtube_script.txt',
@@ -137,7 +177,7 @@ def lambda_handler(event, context):
         )
         print(f"Successfully saved files to S3 bucket: {bucket_name}")
         
-        # 5. Trigger AWS Amplify Webhook to rebuild the frontend site
+        # Trigger AWS Amplify Webhook to rebuild the frontend site
         try:
             webhook_url = get_ssm_parameter("AmplifyWebhookUrl")
             requests.post(webhook_url)

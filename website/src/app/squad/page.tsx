@@ -1,28 +1,15 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { fetchFromS3 } from '@/lib/s3';
 
 export const revalidate = 3600; // Cache for 1 hour
 
 async function getSquadData() {
-  const res = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    cache: 'no-store'
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch squad data');
-  }
-
-  const data = await res.json();
+  const rawSquad = await fetchFromS3('full_squad.json');
+  if (!rawSquad) return [];
   
-  // Find Manchester United ID (16 in this simulation)
-  const manUtdId = data.teams.find((t: any) => t.name === 'Man Utd')?.id || 16;
-
-  // Filter players
-  const players = data.elements.filter((p: any) => p.team === manUtdId);
-
+  const players = JSON.parse(rawSquad);
+  
   // Sort players by ICT index
   players.sort((a: any, b: any) => parseFloat(b.ict_index) - parseFloat(a.ict_index));
 
@@ -44,7 +31,7 @@ export default async function SquadPage() {
 
   const groupedSquad = [1, 2, 3, 4].map(posId => ({
     name: getPositionName(posId),
-    players: squad.filter((p: any) => p.element_type === posId)
+    players: squad.filter((p: any) => p.position_id === posId)
   }));
 
   return (
@@ -70,7 +57,7 @@ export default async function SquadPage() {
                 <div key={player.id} className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300">
                   <div className="relative h-64 bg-gradient-to-t from-black to-transparent flex items-end justify-center pt-4">
                     <img 
-                      src={`https://resources.premierleague.com/premierleague/photos/players/250x250/p${player.code}.png`} 
+                      src={player.image_url} 
                       alt={`${player.first_name} ${player.second_name}`}
                       className="h-full object-contain relative z-10"
                     />

@@ -1,40 +1,36 @@
 import { NextResponse } from 'next/server';
+import { fetchFromS3 } from '@/lib/s3';
 
 export async function GET() {
   try {
-    const response = await fetch('https://fantasy.premierleague.com/api/fixtures/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      },
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch fixtures: ${response.status}`);
+    const [fixturesRaw, teamsRaw] = await Promise.all([
+      fetchFromS3('fixtures.json'),
+      fetchFromS3('teams.json')
+    ]);
+
+    if (!fixturesRaw || !teamsRaw) {
+      return NextResponse.json({ error: 'Data not found' }, { status: 404 });
     }
+
+    const fixtures = JSON.parse(fixturesRaw);
+    const teams = JSON.parse(teamsRaw);
+
+    const manUtdId = teams.find((t: any) => t.name === 'Man Utd')?.id || 16;
     
-    const data = await response.json();
-    
-    // 16 is Manchester United's FPL ID in this simulation
-    const muFixtures = data.filter((f: any) => f.team_h === 16 || f.team_a === 16);
-    
-    // Find the latest finished match (including provisional finish)
+    const teamMap: Record<number, string> = {};
+    teams.forEach((t: any) => {
+      teamMap[t.id] = t.name;
+    });
+
+    const muFixtures = fixtures.filter((f: any) => f.team_h === manUtdId || f.team_a === manUtdId);
     const isFinished = (f: any) => f.finished || f.finished_provisional;
-    const finishedMatches = muFixtures.filter(isFinished);
-    const lastMatch = finishedMatches.length > 0 ? finishedMatches[finishedMatches.length - 1] : null;
-    
-    // Find the next upcoming match
+
+    const pastMatches = muFixtures.filter(isFinished);
     const upcomingMatches = muFixtures.filter((f: any) => !isFinished(f));
+
+    const lastMatch = pastMatches.length > 0 ? pastMatches[pastMatches.length - 1] : null;
     const nextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null;
 
-    // Fetch bootstrap-static to get team names
-    const bootstrapResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        },
-        next: { revalidate: 86400 } // Cache for 24 hours
-    });
-    
     let teamMap: Record<number, string> = {};
     if (bootstrapResponse.ok) {
         const bootstrapData = await bootstrapResponse.json();
