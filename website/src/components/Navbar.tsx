@@ -25,16 +25,19 @@ export default function Navbar() {
           {/* Navigation Links */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <Link href="#home" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
+              <Link href="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
                 Home
               </Link>
-              <Link href="#news" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
-                News & Fixtures
+              <Link href="/#news" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
+                News
               </Link>
-              <Link href="#squad" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
-                Squad Data
+              <Link href="/fixtures" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
+                Fixtures
               </Link>
-              <Link href="#analytics" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
+              <Link href="/squad" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
+                Full Squad
+              </Link>
+              <Link href="/#analytics" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors uppercase tracking-wider font-heading">
                 Analytics
               </Link>
             </div>
