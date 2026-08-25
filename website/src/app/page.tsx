@@ -3,7 +3,10 @@ import StatsDashboard from '@/components/StatsDashboard';
 import AdvancedAnalytics from '@/components/AdvancedAnalytics';
 import AffiliateBlock from '@/components/AffiliateBlock';
 import PremiumPaywall from '@/components/PremiumPaywall';
-import LiveNewsFixtures from '@/components/LiveNewsFixtures';
+import Navbar from '@/components/Navbar';
+import HeroSection from '@/components/HeroSection';
+import LiveNewsSection from '@/components/LiveNewsSection';
+import Footer from '@/components/Footer';
 
 // Check if we are running in Amplify
 const amplifyCredentials = process.env.MY_AWS_ACCESS_KEY_ID
@@ -45,45 +48,33 @@ export default async function Home() {
   const rawStats = await fetchFromS3("latest_stats.json");
   const youtubeScript = await fetchFromS3("latest_youtube_script.txt");
 
-  const statsData = rawStats ? JSON.parse(rawStats) : { top_performers: [] };
+  const statsData = rawStats ? JSON.parse(rawStats) : { top_performers: [], live_news: [] };
   const finalScript = youtubeScript || "Loading live Gemini AI analysis from AWS...";
 
   return (
-    <main className="min-h-screen bg-sir-alex text-white flex flex-col items-center">
+    <main className="min-h-screen bg-sir-alex text-white flex flex-col font-sans">
+      <Navbar />
       
-      {/* 1. Dynamic Hero Section */}
-      <section className="relative w-full min-h-[60vh] flex flex-col justify-center p-8 md:p-16 overflow-hidden bg-black/40">
-        <div className="w-full max-w-7xl mx-auto z-10 flex flex-col items-start justify-center">
-          <span className="text-utd-gold font-bold tracking-widest uppercase mb-4 block text-lg shadow-black drop-shadow-md">Welcome to the Theatre of Dreams</span>
-          <h1 className="text-6xl md:text-8xl font-heading text-white uppercase tracking-wider mb-8 drop-shadow-[0_5px_5px_rgba(0,0,0,1)]">
-            Manchester United
-            <span className="block text-utd-red">Tactical Hub</span>
-          </h1>
-          <p className="text-xl text-gray-200 font-body leading-relaxed max-w-3xl glass-card p-6 border-l-4 border-utd-red shadow-2xl backdrop-blur-xl">
-            {finalScript.substring(0, 300)}... 
-          </p>
-        </div>
-      </section>
+      <HeroSection />
       
-      {/* 2. Live News & Fixtures Widget */}
-      <section className="w-full max-w-7xl mx-auto p-8 mt-4">
-        <LiveNewsFixtures />
-      </section>
+      <LiveNewsSection news={statsData.live_news || []} />
       
       {/* 3. Stats Dashboard */}
-      <section className="w-full max-w-7xl mx-auto p-8 mt-12">
+      <section id="squad" className="w-full max-w-7xl mx-auto p-8 mt-12 scroll-mt-24 relative z-10">
         <StatsDashboard statsData={statsData} youtubeScript={finalScript} />
       </section>
 
       {/* 4. Advanced Analytics (Radar Chart) */}
-      <section className="w-full max-w-7xl mx-auto p-8 mt-4">
+      <section id="analytics" className="w-full max-w-7xl mx-auto p-8 mt-4 scroll-mt-24 relative z-10">
         <AdvancedAnalytics statsData={statsData} />
       </section>
 
-      <section className="w-full max-w-7xl mx-auto p-8">
+      <section id="premium" className="w-full max-w-7xl mx-auto p-8 scroll-mt-24 relative z-10">
         <AffiliateBlock />
         <PremiumPaywall />
       </section>
+      
+      <Footer />
     </main>
   );
 }
